@@ -565,9 +565,9 @@ function doLogin(){
   }
   if(!ok) return;
 
-  if(email===DEMO.email && pw===DEMO.password){
-    currentUser = DEMO;
-    document.getElementById('home-username').textContent = currentUser.name;
+  if(email && pw.length>=6){
+    currentUser = {email, password:pw, name:'Student'};
+    document.getElementById('home-username').textContent = email;
     showScreen('home');
   } else {
     document.getElementById('login-alert-msg').textContent='Incorrect email or password. Try the demo credentials below.';
