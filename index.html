@@ -244,7 +244,7 @@ footer{text-align:center;padding:1rem;font-size:.73rem;color:var(--mid);border-t
           <span class="input-icon">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
           </span>
-          <input class="form-input" id="inp-email" type="email" placeholder="student@academix.edu" autocomplete="email"/>
+          <input class="form-input" id="inp-email" type="email" placeholder="student(at)academix.edu" autocomplete="email"/>
         </div>
         <div class="error-msg" id="err-email">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -297,7 +297,7 @@ footer{text-align:center;padding:1rem;font-size:.73rem;color:var(--mid);border-t
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <div>
           Use these credentials to try the system:<br/>
-          <span class="demo-creds"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a393e3f2e2f243e0a2b292b2e2f272332642f2e3f">[email&#160;protected]</a> &nbsp;/&nbsp; demo123</span>
+          <span class="demo-creds">student [at] academix.edu &nbsp;/&nbsp; demo123</span>
         </div>
       </div>
 
@@ -524,7 +524,7 @@ const courses = [
 ];
 
 /* ── Auth state ── */
-const DEMO = {email:'student@academix.edu', password:'demo123', name:'Alex Johnson'};
+const DEMO = {email:'student [at] academix.edu', password:'demo123', name:'Alex Johnson'};
 let currentUser = null;
 let pwVisible = false;
 let selectedCourse = null;
