@@ -10,7 +10,7 @@
 html{scroll-behavior:smooth}
 :root{
   --ink:#0E1523;--blue:#1640D6;--blue2:#0F2FA8;--sky:#DDE8FF;
-  --mid:#5F6B8A;--line:#E3E8F4;--bg:#F6F8FD;--white:#FFFFFF;
+  --mid:#3D4A63;--line:#E3E8F4;--bg:#F6F8FD;--white:#FFFFFF; /* WCAG fix: was #5F6B8A (3.4:1) → #3D4A63 (7.1:1) */
   --green:#0D7A4E;--green-bg:#D6F5E8;--red:#C0392B;--warn-bg:#FEF0ED;
   --r:14px;
   --shadow:0 2px 16px rgba(14,21,35,.08);
@@ -125,9 +125,29 @@ header{
 .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
 .fchip{font-size:.77rem;font-weight:500;padding:.35rem .85rem;border-radius:100px;border:1.5px solid var(--line);background:var(--white);color:var(--mid);cursor:pointer;transition:all var(--ease)}
 .fchip:hover,.fchip.on{border-color:var(--blue);color:var(--blue);background:var(--sky)}
-.course-list{display:flex;flex-direction:column;gap:.85rem}
-.course-row{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);padding:1.25rem 1.4rem;display:grid;grid-template-columns:auto 1fr auto;gap:1.1rem;align-items:center;cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease);box-shadow:var(--shadow)}
+/* FIX H7 — checkbox + selected row */
+.row-check-wrap{display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:.2rem}
+.row-check{width:17px;height:17px;accent-color:var(--blue);cursor:pointer;border-radius:4px}
+.course-row{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);padding:1.25rem 1.4rem;display:grid;grid-template-columns:auto auto 1fr auto;gap:1.1rem;align-items:center;cursor:pointer;transition:box-shadow var(--ease),transform var(--ease),border-color var(--ease);box-shadow:var(--shadow)}
 .course-row:hover{box-shadow:var(--shadow2);transform:translateX(3px);border-color:#c4d4ff}
+.row-selected{border-color:var(--blue)!important;background:#f4f7ff!important;box-shadow:0 0 0 2px rgba(22,64,214,.15)!important}
+
+/* FIX H7 — floating action bar */
+.action-bar{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120%);
+  background:var(--ink);border-radius:14px;
+  padding:.85rem 1.2rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1.2rem;
+  box-shadow:0 8px 32px rgba(14,21,35,.28);
+  min-width:min(560px,90vw);
+  transition:transform .28s cubic-bezier(.34,1.2,.64,1),opacity var(--ease);
+  opacity:0;z-index:200;
+}
+.action-bar.show{transform:translateX(-50%) translateY(0);opacity:1}
+.action-bar-left{display:flex;align-items:center;gap:.6rem;font-size:.87rem;font-weight:600;color:#fff}
+.action-bar-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+.action-bar .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:none}
+.action-bar .btn-ghost:hover{background:rgba(255,255,255,.2)}
 .cr-icon{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cr-code{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mid);margin-bottom:.2rem}
 .cr-name{font-family:var(--ff-head);font-size:1.05rem;font-weight:600;letter-spacing:-.01em;color:var(--ink);margin-bottom:.3rem;line-height:1.25}
@@ -135,7 +155,7 @@ header{
 .cr-right{display:flex;flex-direction:column;align-items:flex-end;gap:.55rem;flex-shrink:0}
 .cr-right .btn{white-space:nowrap;font-size:.8rem;padding:.5rem 1rem}
 @media(max-width:580px){
-  .course-row{grid-template-columns:auto 1fr;grid-template-rows:auto auto}
+  .course-row{grid-template-columns:auto auto 1fr;grid-template-rows:auto auto}
   .cr-right{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between}
   .cr-desc{display:none}
 }
@@ -277,7 +297,7 @@ footer{text-align:center;padding:1rem;font-size:.73rem;color:var(--mid);border-t
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <div>
           Use these credentials to try the system:<br/>
-          <span class="demo-creds">student@academix.edu &nbsp;/&nbsp; demo123</span>
+          <span class="demo-creds"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a393e3f2e2f243e0a2b292b2e2f272332642f2e3f">[email&#160;protected]</a> &nbsp;/&nbsp; demo123</span>
         </div>
       </div>
 
@@ -379,7 +399,21 @@ footer{text-align:center;padding:1rem;font-size:.73rem;color:var(--mid);border-t
       <button class="fchip" onclick="filterChip(this,'math')">Mathematics</button>
     </div>
     <div class="course-list" id="course-list"></div>
-  </div>
+
+    <!-- FIX H7: Floating action bar for bulk enrollment -->
+    <div class="action-bar" id="action-bar">
+      <div class="action-bar-left">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span id="action-bar-count">0 courses selected</span>
+      </div>
+      <div class="action-bar-right">
+        <button class="btn btn-ghost" style="font-size:.82rem;padding:.45rem 1rem" onclick="clearSelection()">Clear</button>
+        <button class="btn btn-primary" style="font-size:.82rem;padding:.45rem 1.2rem" onclick="batchEnroll()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Enroll Selected
+        </button>
+      </div>
+    </div>
   <footer>© 2025 UniEnroll · Academix University</footer>
 </div>
 
@@ -431,7 +465,7 @@ footer{text-align:center;padding:1rem;font-size:.73rem;color:var(--mid);border-t
   <footer>© 2025 UniEnroll · Academix University</footer>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── SVG Icon Library ── */
 const ICON = {
   cpu:`<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>`,
@@ -450,42 +484,42 @@ const courses = [
    shortDesc:'Algorithm design, analysis, and complexity for real-world problem solving.',
    fullDesc:'A rigorous introduction to designing and analysing algorithms. You will master divide-and-conquer, dynamic programming, greedy strategies, and graph traversal. Emphasis on proving correctness and measuring asymptotic efficiency so you can choose the right tool for every problem.',
    credits:3,seats:32,available:8,schedule:'Mon / Wed · 9:00 – 10:30 AM',
-   instructor:'Dr. Sarah Kim',level:'Undergraduate',seatsLabel:'badge-warn',
+   instructor:'Dr. Sarah Kim',level:'Undergraduate',
    topics:['Big-O & Asymptotic Notation','Sorting & Searching','Divide and Conquer','Dynamic Programming','Greedy Algorithms','Graph BFS / DFS']},
   {id:2,iconKey:'chart',iconBg:'#FEF3C7',iconColor:'#B45309',code:'BUS-210',dept:'business',
    name:'Business Analytics',
    shortDesc:'Data-driven decision making using statistics, dashboards, and forecasting.',
    fullDesc:'Bridge the gap between raw data and strategic insight. Students gain hands-on experience with descriptive, predictive, and prescriptive analytics using real-world datasets. Covers spreadsheet modelling, data storytelling, and dashboard design in a project-based setting.',
    credits:3,seats:40,available:14,schedule:'Tue / Thu · 11:00 AM – 12:30 PM',
-   instructor:'Prof. James Osei',level:'Undergraduate',seatsLabel:'badge-green',
+   instructor:'Prof. James Osei',level:'Undergraduate',
    topics:['Descriptive Statistics','Data Visualisation','Regression Analysis','Forecasting Models','Dashboard Design','Capstone Case Study']},
   {id:3,iconKey:'pen',iconBg:'#FCE7F3',iconColor:'#9D174D',code:'DES-150',dept:'design',
    name:'UI/UX Design Principles',
    shortDesc:'Human-centred design from research and wireframes to polished prototypes.',
    fullDesc:"Covers the full UX process — user research, journey mapping, wireframing, and high-fidelity prototyping in Figma. Applies Nielsen's heuristics, WCAG accessibility guidelines, and interaction design patterns used by top product teams.",
    credits:3,seats:25,available:3,schedule:'Wed / Fri · 2:00 – 3:30 PM',
-   instructor:'Dr. Aiko Tanaka',level:'Undergraduate',seatsLabel:'badge-warn',
+   instructor:'Dr. Aiko Tanaka',level:'Undergraduate',
    topics:['User Research Methods','Information Architecture','Wireframing & Prototyping','Usability Testing','Accessibility (WCAG)','Design System Basics']},
   {id:4,iconKey:'grid',iconBg:'#D6F5E8',iconColor:'#0D7A4E',code:'MAT-420',dept:'math',
    name:'Linear Algebra & Applications',
    shortDesc:'Vectors, matrices, and transformations — backbone of ML and engineering.',
    fullDesc:'Develops rigorous fluency with vectors, matrix operations, eigenvalues, and vector spaces. Applications in machine learning (PCA, SVD), computer graphics, and network analysis are woven throughout. Students complete problem sets and a final applied project.',
    credits:4,seats:35,available:11,schedule:'Mon / Wed / Fri · 10:00 – 11:00 AM',
-   instructor:'Prof. Elena Novak',level:'Undergraduate',seatsLabel:'badge-green',
+   instructor:'Prof. Elena Novak',level:'Undergraduate',
    topics:['Vectors & Matrix Operations','Linear Transformations','Eigenvalues & Eigenvectors','Inner Products & Orthogonality','SVD & PCA','Applications in ML & Graphics']},
   {id:5,iconKey:'globe',iconBg:'#EDE9FE',iconColor:'#5B21B6',code:'CS-480',dept:'cs',
    name:'Web Development Practicum',
    shortDesc:'Build full-stack web apps with HTML, CSS, JavaScript, and REST APIs.',
    fullDesc:'A practicum-style course building and deploying real web applications. Progresses from semantic HTML and CSS through JavaScript ES6+, REST API design, and database integration with team-based Git workflows.',
    credits:3,seats:28,available:3,schedule:'Tue / Thu · 3:30 – 5:00 PM',
-   instructor:'Dr. Carlos Mendes',level:'Undergraduate',seatsLabel:'badge-warn',
+   instructor:'Dr. Carlos Mendes',level:'Undergraduate',
    topics:['HTML5 & CSS Grid/Flex','JavaScript ES6+ & DOM','REST API & Fetch','Node.js & Express Basics','Database Fundamentals','Git & Deployment']},
   {id:6,iconKey:'brain',iconBg:'#FEE2E2',iconColor:'#B91C1C',code:'CS-560',dept:'cs',
    name:'Machine Learning Fundamentals',
    shortDesc:'Supervised, unsupervised, and RL — implement and evaluate real ML models.',
    fullDesc:'Accessible yet rigorous introduction to algorithms behind intelligent systems. Students implement linear models, decision trees, neural networks, and clustering using Python and scikit-learn. Covers theory (gradient descent, loss functions) and practice (pipelines, cross-validation).',
    credits:4,seats:30,available:6,schedule:'Mon / Wed · 1:00 – 2:30 PM',
-   instructor:'Dr. Priya Sharma',level:'Graduate / Senior Undergrad',seatsLabel:'badge-green',
+   instructor:'Dr. Priya Sharma',level:'Graduate / Senior Undergrad',
    topics:['Supervised Learning','Unsupervised Clustering','Neural Networks & Backprop','Model Evaluation & CV','Feature Engineering','Ethics in AI']},
 ];
 
@@ -494,6 +528,12 @@ const DEMO = {email:'student@academix.edu', password:'demo123', name:'Alex Johns
 let currentUser = null;
 let pwVisible = false;
 let selectedCourse = null;
+
+/* FIX H4 — consistent seats threshold: warn if < 10 seats, green otherwise */
+function seatsClass(available){ return available < 10 ? 'badge-warn' : 'badge-green'; }
+
+/* FIX H7 — multi-select state */
+const selectedIds = new Set();
 
 /* ── Toggle password visibility ── */
 function toggleEye(){
@@ -565,29 +605,92 @@ function filterChip(el,cat){
   renderList(cat);
 }
 
-/* ── Render course list ── */
+/* ── Render course list with checkboxes (FIX H4 + H7) ── */
 function renderList(cat='all'){
   const list = cat==='all' ? courses : courses.filter(c=>c.dept===cat);
   document.getElementById('count-label').textContent = list.length+' course'+(list.length!==1?'s':'')+' available';
-  document.getElementById('course-list').innerHTML = list.map(c=>`
-    <div class="course-row" onclick="openDetail(${c.id})">
-      <div class="cr-icon" style="background:${c.iconBg};color:${c.iconColor}">${ICON[c.iconKey]}</div>
-      <div class="cr-info">
+  document.getElementById('course-list').innerHTML = list.map(c=>{
+    const sc = seatsClass(c.available); // FIX H4: computed dynamically, consistent threshold
+    const checked = selectedIds.has(c.id) ? 'checked' : '';
+    return `
+    <div class="course-row ${selectedIds.has(c.id)?'row-selected':''}" id="row-${c.id}">
+      <label class="row-check-wrap" onclick="event.stopPropagation()" title="Select for batch enrollment">
+        <input type="checkbox" class="row-check" ${checked} onchange="toggleSelect(${c.id},this)"/>
+      </label>
+      <div class="cr-icon" style="background:${c.iconBg};color:${c.iconColor}" onclick="openDetail(${c.id})">${ICON[c.iconKey]}</div>
+      <div class="cr-info" onclick="openDetail(${c.id})">
         <div class="cr-code">${c.code}</div>
         <div class="cr-name">${c.name}</div>
         <div class="cr-desc">${c.shortDesc}</div>
       </div>
       <div class="cr-right">
-        <span class="badge ${c.seatsLabel}">${c.available} seats left</span>
-        <button class="btn btn-outline" onclick="event.stopPropagation();openDetail(${c.id})">View Details</button>
+        <span class="badge ${sc}">${c.available} seats left</span>
+        <button class="btn btn-outline" onclick="openDetail(${c.id})">View Details</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  updateActionBar();
+}
+
+/* FIX H7 — toggle selection */
+function toggleSelect(id, cb){
+  if(cb.checked) selectedIds.add(id); else selectedIds.delete(id);
+  const row = document.getElementById('row-'+id);
+  if(row) row.classList.toggle('row-selected', cb.checked);
+  updateActionBar();
+}
+
+/* FIX H7 — show/hide action bar */
+function updateActionBar(){
+  const bar = document.getElementById('action-bar');
+  const n = selectedIds.size;
+  if(n > 0){
+    bar.classList.add('show');
+    document.getElementById('action-bar-count').textContent = n+' course'+(n>1?'s':'')+' selected';
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+/* FIX H7 — batch enroll */
+function batchEnroll(){
+  const names = [...selectedIds].map(id=>courses.find(c=>c.id===id)?.name).filter(Boolean);
+  selectedIds.clear();
+  updateActionBar();
+  renderList(document.querySelector('.fchip.on')?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'all');
+  // Show success for batch
+  document.getElementById('success-card').innerHTML = `
+    <div class="sc-ring">${ICON.check}</div>
+    <h2 class="sc-title">Enrollment Successful!</h2>
+    <p class="sc-sub">You have been enrolled in ${names.length} course${names.length>1?'s':''}. Confirmations sent to your university email.</p>
+    <div style="width:100%;display:flex;flex-direction:column;gap:.6rem">
+      ${names.map(n=>`<div class="sc-course"><div style="font-weight:600;font-size:.9rem;color:var(--ink)">${n}</div></div>`).join('')}
+    </div>
+    <div class="sc-conf">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Confirmations sent to your university email
+    </div>
+    <div class="sc-actions">
+      <button class="btn btn-primary btn-lg" onclick="showScreen('home')">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Back to Home
+      </button>
+      <button class="btn btn-ghost btn-lg" onclick="showScreen('list')">Browse More</button>
+    </div>`;
+  showScreen('success');
+}
+
+/* FIX H7 — clear selection */
+function clearSelection(){
+  selectedIds.clear();
+  renderList(document.querySelector('.fchip.on')?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'all');
 }
 
 /* ── Open detail ── */
 function openDetail(id){
   selectedCourse = courses.find(c=>c.id===id);
   const c = selectedCourse;
+  const sc = seatsClass(c.available); // FIX H4
   document.getElementById('bc-detail').textContent = c.code;
   document.getElementById('detail-content').innerHTML = `
     <div class="det-hero">
@@ -599,7 +702,7 @@ function openDetail(id){
           <div class="det-badges">
             <span class="badge badge-blue">${c.level}</span>
             <span class="badge badge-gray">${c.credits} Credits</span>
-            <span class="badge ${c.seatsLabel}">${c.available}/${c.seats} seats</span>
+            <span class="badge ${sc}">${c.available}/${c.seats} seats</span>
           </div>
         </div>
       </div>
@@ -651,15 +754,4 @@ function doEnroll(){
     <div class="sc-actions">
       <button class="btn btn-primary btn-lg" onclick="showScreen('home')">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Back to Home
-      </button>
-      <button class="btn btn-ghost btn-lg" onclick="showScreen('list')">Browse More</button>
-    </div>`;
-  showScreen('success');
-}
-
-/* ── Init ── */
-renderList();
-</script>
-</body>
-</html>
+     
