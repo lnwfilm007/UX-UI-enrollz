@@ -244,7 +244,7 @@ footer{text-align:center;padding:1rem;font-size:.73rem;color:var(--mid);border-t
           <span class="input-icon">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
           </span>
-          <input class="form-input" id="inp-email" type="email" placeholder="student(at)academix.edu" autocomplete="email"/>
+          <input class="form-input" id="inp-email" type="text" placeholder="student [at] academix.edu" autocomplete="off"/>
         </div>
         <div class="error-msg" id="err-email">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -553,7 +553,7 @@ function doLogin(){
   ['login-alert','err-email','err-pw'].forEach(id=>document.getElementById(id).classList.remove('show'));
   ['inp-email','inp-pw'].forEach(id=>document.getElementById(id).classList.remove('error'));
 
-  if(!email || !/\S+@\S+\.\S+/.test(email)){
+  if(!email){
     document.getElementById('err-email').classList.add('show');
     document.getElementById('inp-email').classList.add('error');
     ok=false;
